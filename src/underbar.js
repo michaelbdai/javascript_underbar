@@ -250,7 +250,8 @@
     for (var i = 0; i < collection.length; i ++){
       var currentElement = collection[i];
       if (typeof functionOrKey === 'string'){
-        var fn = String.prototype[functionOrKey]
+        // var fn = String.prototype[functionOrKey]
+        var fn = currentElement[functionOrKey]
         currentResult = fn.apply(currentElement, args);
       } 
       else currentResult = functionOrKey.apply(currentElement, args);
