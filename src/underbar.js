@@ -108,7 +108,6 @@
         else accumulator = newAccumulator;        
       }
     }
-
     return accumulator;
   };
   // Determine if the array or object contains a given value (using `===`).
@@ -258,15 +257,50 @@
     // If iterator is a string, sort objects by that property with the name
     // of that string. For example, _.sortBy(people, 'name') should sort
     // an array of people by their name.
+  _.sort = function(array, comparingFunction){
+    // this function act exactly like build-in sort function. 
+    // instead of array.sort(func), its sytax is _.sort(array, func)
+    // function is optional
+    var copyOfArray = array.slice();
+    if (comparingFunction === undefined) {
+      comparingFunction = function(a, b){
+        return a.toString() - b.toString();
+      }
+    }
+    var sortTwo = function(twoElementsArray, comparingFunction){
+      var a = twoElementsArray[0];
+      var b = twoElementsArray[1];
+      return (comparingFunction(a , b) > 0 || a === undefined) ? [b, a] : [a, b]
+    };
+    var stepOfSort = function (array1, indexOfElement, comparingFunction){
+      for (var i = indexOfElement; i > 0; i --){
+        var currentElement = array1[i];
+        var comparedElement = array1[i - 1];
+        var sortingResult = sortTwo([comparedElement, currentElement], comparingFunction);
+        if (sortingResult[1] === currentElement) {
+          break;
+        }
+        else {
+          array1[i] = sortingResult[1];
+          array1[i - 1] = sortingResult[0];
+        }
+      }
+      return array1;
+    };
+    return _.reduce( array, function( previousResult, currentElement, index){
+      return stepOfSort(previousResult, index, comparingFunction) 
+    }, copyOfArray)
+  };
+
   _.sortBy = function(collection, iterator) {
-    if (typeof iterator === 'function') var newCollection = collection.sort(function(a , b) {return iterator(a) - iterator(b)});
-    else { var newCollection = collection.sort(function(a , b) {return a[iterator] - b[iterator]}); }
+    if (typeof iterator === 'function') var newCollection = _.sort(collection, function(a , b) {return iterator(a) - iterator(b)});
+    else { var newCollection = _.sort(collection, function(a , b) {return a[iterator] - b[iterator]}); }
     return newCollection;
   };
 
     // Zip together two or more arrays with elements of the same index
     // going together.
-    //
+    
     // Example:
     // _.zip(['a','b','c','d'], [1,2,3]) returns [['a',1], ['b',2], ['c',3], ['d',undefined]]
   _.zip = function(...arg) {
